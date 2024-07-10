@@ -32,10 +32,32 @@ impl<'a> Iterator for Lexer<'a> {
     type Item = LexToken;
 
     fn next(&mut self) -> Option<Self::Item> {
-
-
         None
     }
+}
+
+/// Returns true if the given character `c` is a delimiter, such as a space or semicolon.
+fn is_delimiter(c: char) -> bool {
+    c == ' ' || c == ';'
+}
+
+fn read_until_delimiter(lexer: &mut Lexer) -> String {
+    let mut buffer = String::new();
+    while let Some(c) = lexer.chars.peek() {
+        if is_delimiter(*c) {
+            break;
+        }
+
+        buffer.push(lexer.chars.next().unwrap())
+    }
+
+    buffer
+}
+
+fn try_read_keyword(lexer: &mut Lexer) -> Option<LexToken> {
+
+
+    todo!();
 }
 
 /// Eats whitespace.
@@ -102,5 +124,27 @@ mod test {
 
         eat_whitespace(&mut lexer);
         assert_eq!(lexer.chars.next(), Some('b'));
+    }
+
+    #[test]
+    fn it_reads_until_delimiter() {
+        let input = "asdf ghjk;qwerty";
+
+        let mut lexer = Lexer::new(input.into());
+
+        let actual = read_until_delimiter(&mut lexer);
+        assert_eq!("asdf", actual);
+        lexer.chars.next();
+
+        let actual = read_until_delimiter(&mut lexer);
+        assert_eq!("ghjk", actual);
+        lexer.chars.next();
+
+        let actual = read_until_delimiter(&mut lexer);
+        assert_eq!("qwerty", actual);
+        lexer.chars.next();
+
+        let actual = read_until_delimiter(&mut lexer);
+        assert_eq!("", actual);
     }
 }
