@@ -38,6 +38,18 @@ impl<'a> Iterator for Lexer<'a> {
     }
 }
 
+/// Eats whitespace.
+/// The next character in the buffer is guaranteed to either be `None` or a non-whitespace character.
+fn eat_whitespace(lexer: &mut Lexer) {
+    while let Some(c) = lexer.chars.peek() {
+        if c.is_whitespace() {
+            lexer.chars.next();
+        } else {
+            break;
+        }
+    }
+}
+
 #[cfg(test)]
 mod test {
     use super::*;
@@ -77,5 +89,18 @@ mod test {
             None,
             lexer.next()
         )
+    }
+
+    #[test]
+    fn it_eats_whitespace() {
+        let input = "   a   b";
+
+        let mut lexer = Lexer::new(input.into());
+
+        eat_whitespace(&mut lexer);
+        assert_eq!(lexer.chars.next(), Some('a'));
+
+        eat_whitespace(&mut lexer);
+        assert_eq!(lexer.chars.next(), Some('b'));
     }
 }
